@@ -71,7 +71,6 @@ public class joystickTest extends LinearOpMode {
             forkliftMotor.setPower(gamepad2.left_stick_y);
 
             if(gamepad1.left_bumper){
-                greenLED.setPower(1);
                 toggleForwardSweeper = false;
                 //Left bumper pressed, go in reverse on sweeper
                 sweeperMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -84,12 +83,21 @@ public class joystickTest extends LinearOpMode {
                 sweeperMotor.setDirection(DcMotor.Direction.FORWARD);
                 sweeperMotor.setPower(1.0f);
             } else{
-                blueLED.setPower(0);
-                blueLED.setPower(0);
                 sweeperMotor.setDirection(DcMotor.Direction.FORWARD);
                 sweeperMotor.setPower(0.0f);
             }
 
+
+            if(gamepad1.y){
+                blueLED.setPower(1);
+            }
+            else if(gamepad1.a){
+                greenLED.setPower(0);
+            }
+            else {
+                blueLED.setPower(0);
+                blueLED.setPower(0);
+            }
             //For forward sweeper, set toggle
             /*
             if(toggleForwardSweeper){

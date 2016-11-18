@@ -271,7 +271,9 @@ public class FirstAuto extends LinearOpMode {
             }}
         //ADD BUTTON PRESSING
         runDriveTrain(0,0);
-        sleep(10000);
+        leftButton.setPosition(0);
+        sleep(5000);
+        leftButton.setPosition(1);
         }
 
     public boolean pingRight() {
