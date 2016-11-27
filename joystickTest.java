@@ -48,8 +48,8 @@ public class joystickTest extends LinearOpMode {
         forkliftMotor = hwMap.dcMotor.get("forklift");
         sweeperMotor = hwMap.dcMotor.get("sweeper");
         shooterMotor = hwMap.dcMotor.get("shooter");
-       leftButton = hwMap.servo.get("left_button");
-         rightButton = hwMap.servo.get("right_button");
+        leftButton = hwMap.servo.get("left_button");
+        rightButton = hwMap.servo.get("right_button");
         blueLED=hwMap.dcMotor.get("blue");
         greenLED=hwMap.dcMotor.get("green");
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -27,6 +27,7 @@ public class FirstAuto extends LinearOpMode {
     DcMotor shooterMotor;
     Servo leftButton;
     Servo rightButton;
+
     public ColorSensor colorSensorLeft=null;
     public ColorSensor colorSensorRight=null;
 
@@ -113,7 +114,7 @@ public class FirstAuto extends LinearOpMode {
         }
         if(direction=="right"||direction=="r"){
             //degree=0;
-            while(currentHeading<358 && currentHeading>3 && opModeIsActive()){
+            while(currentHeading<354 && currentHeading>3 && opModeIsActive()){
                 currentHeading=gyroSensor.getHeading();
                 runDriveTrain((float)speed,(float)-speed);
                 telemetry.addData("heading",currentHeading);
@@ -258,12 +259,22 @@ public class FirstAuto extends LinearOpMode {
         else if(colorSensorLeft.red()>=2 && colorSensorLeft.red()>colorSensorLeft.blue()){
             color="red";
         }
+        float r=.5f;
+        float l=.5f;
         while(color!=MYCOLOR && opModeIsActive()){
             telemetry.addData("Current Color",color);
             telemetry.addData("red",colorSensorLeft.red());
             telemetry.addData("blue",colorSensorLeft.blue());
             telemetry.update();
-            runDriveTrain(.5f,.5f);
+            if(gyroSensor.getHeading()>0){
+                l+=.0001;
+                r-=.0001;
+            }
+            if(gyroSensor.getHeading()<0){
+                l-=.0001;
+                r+=.0001;
+            }
+            runDriveTrain(r,l);
 
             if(colorSensorLeft.blue()>=2 && colorSensorLeft.blue()>colorSensorLeft.red()){
                 color="blue";
@@ -271,12 +282,22 @@ public class FirstAuto extends LinearOpMode {
            else if(colorSensorLeft.red()>=2 && colorSensorLeft.red()>colorSensorLeft.blue()){
                 color="red";
             }}
-        //ADD BUTTON PRESSING
         runDriveTrain(0,0);
-        leftButton.setPosition(0);
-        sleep(5000);
-        leftButton.setPosition(1);
+        pressLeftButton();
         }
+
+    //Use the button pressor to press the beacon (on left side)
+    public void pressLeftButton(){
+        leftButton.setPosition(0);
+        sleep(3000);
+        leftButton.setPosition(1);
+    }
+
+    public void pressRightButton(){
+        rightButton.setPosition(0.8);
+        sleep(3000);
+        rightButton.setPosition(0);
+    }
 
     public boolean pingRight() {
         long iTime = System.currentTimeMillis();
@@ -326,9 +347,9 @@ public class FirstAuto extends LinearOpMode {
 
 
         //This stuff is decent
-        float turningSpeed=.6f;
-        travelMeters(.9f, 1f);
-        turnToAbsDegree(270,turningSpeed,"left");
+        float turningSpeed=.5f;
+        travelMeters(.5f, 1f);
+        turnToAbsDegree(315,turningSpeed,"left");
         travelMeters(.7f,1);
         turnToAbsDegree(0,turningSpeed,"right");
         //This stuff is not
