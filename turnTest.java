@@ -66,17 +66,22 @@ public class turnTest extends LinearOpMode {
     }
     @Override
     public void runOpMode() throws InterruptedException {
+        waitForStart();
         leftMotor=hardwareMap.dcMotor.get("left_drive");
         rightMotor=hardwareMap.dcMotor.get("right_drive");
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         gyroSensor=hardwareMap.gyroSensor.get("gyro");
-        turnRightDegrees(135);
+        leftMotor.setPower(1);
+        rightMotor.setPower(-1);
+        //turnRightDegrees(135);
         telemetry.addData("current angle: ",gyroSensor.getHeading());
         telemetry.addData("Calibrating",false);
         telemetry.update();
         while(opModeIsActive()){
-            idle();
+            telemetry.addData("current angle: ",gyroSensor.getHeading());
+            telemetry.addData("Calibrating",false);
+            telemetry.update();
         }
     }
 }

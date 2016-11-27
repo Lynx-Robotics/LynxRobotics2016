@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
@@ -10,39 +11,44 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 @Autonomous(name="ColorSensorTest", group="Iterative Opmode")
 public class ColorSensorTest extends LinearOpMode {
     HardwareMap hw=null;
-    //comment
+    public ColorSensor colorSensorLeft=null;
+    public ColorSensor colorSensorRight=null;
+
+
     public void runOpMode() throws InterruptedException{
-        HardwareFunctions hf=new HardwareFunctions(hardwareMap);
         waitForStart();
+        colorSensorRight=hardwareMap.colorSensor.get("color_right");
+        colorSensorLeft=hardwareMap.colorSensor.get("color_left");
+
+
 
         int i = 0;
-        hf.setColorSensorLight(false);
+        colorSensorLeft.enableLed(false);
+        colorSensorRight.enableLed(true);
         while(opModeIsActive()){
-            hf.runDriveTrain(0.5f,0.5f);
+            /*
             //telemetry.addData("", hf.getColorSensorBlue() + " " + hf.getColorSensorGreen() + " " + hf.getColorSensorRed());
-            if(hf.getColorSensorBlue() > 4 && hf.getColorSensorBlue() > hf.getColorSensorRed()) {
-                telemetry.addData("(Blue) Blue", hf.getColorSensorBlue() + " Red: " + hf.getColorSensorRed());
+            if(colorSensorLeft.blue() > 4 && colorSensorLeft.blue() > colorSensorLeft.red()) {
+                telemetry.addData("(Blue) Blue", colorSensorLeft.blue() + " Red: " + hf.getColorSensorRed());
             } else if (hf.getColorSensorRed() > 4 && hf.getColorSensorBlue() < hf.getColorSensorRed()) {
                 telemetry.addData("(Red) Blue", hf.getColorSensorBlue() + " Red: " + hf.getColorSensorRed());
             } else {
                 telemetry.addData("(No color) Blue", hf.getColorSensorBlue() + " Red: " + hf.getColorSensorRed());
             }
 
-            telemetry.addData("ODS something", hf.getOpticalDistanceSensorData(hf.ODS));//.021 = distance for color sensing
-            telemetry.addData("Gyro Rotation",hf.getGyroRotation(hf.gyroSensor));
-            telemetry.addData("Ultrasonic Data",hf.getUltrasonicData(hf.ultrasonicSensor));
             telemetry.update();
-           /*if(hf.getColorSensorBlue()>.2){
-           hf.runDriveTrain(20,20);}
-           else if(hf.getColorSensorRed()>.2){
-               hf.runDriveTrain(-20,-20);
-           } else {
-               hf.runDriveTrain(0,0);
-           }*/
-            //hf.runDriveTrain(hf.getColorSensorBlue(), hf.getColorSensorGreen());
+            */
+            printColors();
         }
         idle();
     }
 
+    public void printColors(){
+        telemetry.addData("blue: ", colorSensorLeft.blue());
+        telemetry.addData("red: ", colorSensorLeft.red());
+        telemetry.addData("green: ", colorSensorLeft.green());
+        telemetry.addData("alpha:", colorSensorLeft.alpha());
+        telemetry.update();
+    }
 
 }

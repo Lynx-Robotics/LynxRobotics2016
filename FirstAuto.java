@@ -244,7 +244,9 @@ public class FirstAuto extends LinearOpMode {
 
     public void runDriveTrain(float leftPower,float rightPower){
         leftMotor.setPower(leftPower);
+        telemetry.addData("DriveTrainLeft: ", leftPower);
         rightMotor.setPower(rightPower);
+        telemetry.addData("DriveTainRight: ", rightPower);
     }
     public void pressButton(){
         //once colors are detected line up and press the button
@@ -314,7 +316,7 @@ public class FirstAuto extends LinearOpMode {
 
         gyroSensor.calibrate();
         while (gyroSensor.isCalibrating() && opModeIsActive()) {
-            telemetry.addData("Calibrating", true);
+            telemetry.addData("Calibrating", gyroSensor.isCalibrating());
             telemetry.update();
         }
         //TODO:  FIX pressButton() function.--LATER.  DON'T WORRY.  Needs detection and servo.
