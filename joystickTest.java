@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.lang.*;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 
@@ -24,6 +26,7 @@ public class joystickTest extends LinearOpMode {
     DcMotor shooterMotor;
     Servo leftButton;
     Servo rightButton;
+    OpticalDistanceSensor odsSensor;
     boolean toggleForwardSweeper;
     boolean shootingInProgress,leftButtonInProgress,rightButtonInProgress;
     long leftButtonStartTime, rightButtonStartTime;
@@ -50,6 +53,7 @@ public class joystickTest extends LinearOpMode {
         shooterMotor = hwMap.dcMotor.get("shooter");
         leftButton = hwMap.servo.get("left_button");
         rightButton = hwMap.servo.get("right_button");
+        odsSensor = hwMap.opticalDistanceSensor.get("balldetect");
         blueLED=hwMap.dcMotor.get("blue");
         greenLED=hwMap.dcMotor.get("green");
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -66,6 +70,15 @@ public class joystickTest extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()) {
             //Gamepad 1 is the driver controller and Gamepad 2 is the auxiliary
+            if(odsSensor.getLightDetected()>.1){
+                //ball in shooter
+                //telemetry.addData("(Light) Ball in Shooter:", odsSensor.getLightDetected());
+                telemetry.addData("FIRE","YES");
+            }
+            else{
+                telemetry.addData("FIRE", "NO");}
+                telemetry.update();
+
             leftMotor.setPower(gamepad1.left_stick_y);
             rightMotor.setPower(gamepad1.right_stick_y);
             forkliftMotor.setPower(gamepad2.left_stick_y);

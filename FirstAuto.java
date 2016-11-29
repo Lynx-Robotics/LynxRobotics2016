@@ -31,7 +31,7 @@ public class FirstAuto extends LinearOpMode {
     public ColorSensor colorSensorLeft=null;
     public ColorSensor colorSensorRight=null;
 
-    String MYCOLOR="red";
+    String MYCOLOR="blue";
 
     @Deprecated
     public void turnRightDegrees(double X) {
@@ -95,7 +95,7 @@ public class FirstAuto extends LinearOpMode {
     //Used
     public void turnToAbsDegree(double degree,double speed,String direction){
         double currentHeading=gyroSensor.getHeading();
-        if(direction=="right"||direction=="r"&&degree!=0){
+        if((direction=="right"||direction=="r")&&degree!=0){
             while(currentHeading>degree && currentHeading>3 && opModeIsActive()){
                     //if we start after the degree and we are turning right then do this until we get to degree 0
                     currentHeading=gyroSensor.getHeading();
@@ -112,16 +112,17 @@ public class FirstAuto extends LinearOpMode {
                 telemetry.update();
             }
         }
-        if(direction=="right"||direction=="r"){
+         else if(direction=="right"||direction=="r"){
             //degree=0;
-            while(currentHeading<354 && currentHeading>3 && opModeIsActive()){
-                currentHeading=gyroSensor.getHeading();
-                runDriveTrain((float)speed,(float)-speed);
-                telemetry.addData("heading",currentHeading);
+            while(currentHeading<354 && currentHeading>3 && opModeIsActive()) {
+                currentHeading = gyroSensor.getHeading();
+                runDriveTrain((float) speed, (float) -speed);
+                telemetry.addData("heading", currentHeading);
                 telemetry.update();
             }
+
         }
-        if(direction=="left"||direction=="l") {
+        else if(direction=="left"||direction=="l") {
             while(currentHeading<degree && opModeIsActive()){
                 //if we start before the degree and we are turning left then do this until we get to degree 360
                 currentHeading=gyroSensor.getHeading();
@@ -236,6 +237,58 @@ public class FirstAuto extends LinearOpMode {
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+    //ENCODER DRIVE
+    public void encoderDrive(float distance, float power){
+        resetEncoders();
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        //p(id) loop, telemetry
+        float KP = 0.005f;
+        float KI = 0.001f;
+        //starting I--initialize I
+        float I = 0.0f;
+        long startTime = System.currentTimeMillis();
+        while((leftMotor.getCurrentPosition() <= distance || rightMotor.getCurrentPosition() <= distance) && opModeIsActive()){
+            //should probably allow for some tolerance, maybe like 4 ticks
+            int leftMotorPos=leftMotor.getCurrentPosition();
+            int rightMotorPos=rightMotor.getCurrentPosition();
+            long deltaTime = System.currentTimeMillis() - startTime;
+            float P = leftMotorPos - rightMotorPos;
+            //Calculate integral with change in time from the previous iteration of the loop
+            I = -(I + P*deltaTime);
+            //Set limits to prevent integral windup
+            if(I>100) I=100;
+            else if(I<-100) I=-100;
+            //Placed directly into the motor functions based on which way it is supposed to respond
+            float correction = KP * P + KI * I;
+            //Limit motor power from range of 0 to 100
+            float leftcorrection = power-correction;
+            if(leftcorrection>100) leftcorrection=100; if(leftcorrection<0) leftcorrection=0;
+            float rightcorrection = power+correction;
+            if(rightcorrection>100) rightcorrection=100; if(rightcorrection<0) rightcorrection=0;
+            runDriveTrain(leftcorrection, rightcorrection);
+            telemetry.addData("Correction Factor: ", correction);
+            telemetry.addData("left motor", leftMotor.getCurrentPosition());
+            telemetry.addData("right motor", rightMotor.getCurrentPosition());
+            telemetry.addData("KP", P);
+            telemetry.addData("I: ", I);
+            telemetry.update();
+            //Reset timer
+            startTime = System.currentTimeMillis();
+            //Pause for one millisecond in order to not overwhelm the I loop.
+            try{
+                Thread.sleep(1);
+            } catch(Exception e){
+
+            }
+        }
+        runDriveTrain(0.0f, 0.0f);
+        resetEncoders();
+    }
+
+
+
     private void resetEncoders(){
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -259,23 +312,14 @@ public class FirstAuto extends LinearOpMode {
         else if(colorSensorLeft.red()>=2 && colorSensorLeft.red()>colorSensorLeft.blue()){
             color="red";
         }
-        float r=.5f;
-        float l=.5f;
+        float r=.3f;
+        float l=.3f;
         while(color!=MYCOLOR && opModeIsActive()){
             telemetry.addData("Current Color",color);
             telemetry.addData("red",colorSensorLeft.red());
             telemetry.addData("blue",colorSensorLeft.blue());
             telemetry.update();
-            if(gyroSensor.getHeading()>0){
-                l+=.0001;
-                r-=.0001;
-            }
-            if(gyroSensor.getHeading()<0){
-                l-=.0001;
-                r+=.0001;
-            }
             runDriveTrain(r,l);
-
             if(colorSensorLeft.blue()>=2 && colorSensorLeft.blue()>colorSensorLeft.red()){
                 color="blue";
             }
@@ -288,38 +332,29 @@ public class FirstAuto extends LinearOpMode {
 
     //Use the button pressor to press the beacon (on left side)
     public void pressLeftButton(){
-        leftButton.setPosition(0);
-        sleep(3000);
-        leftButton.setPosition(1);
+        long t=System.currentTimeMillis();
+        while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
+            leftButton.setPosition(0);
+        }
+         t=System.currentTimeMillis();
+        while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
+            leftButton.setPosition(1);
+        }
+
     }
 
     public void pressRightButton(){
-        rightButton.setPosition(0.8);
-        sleep(3000);
-        rightButton.setPosition(0);
+        long t=System.currentTimeMillis();
+        while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
+        rightButton.setPosition(0.8);}
+         t=System.currentTimeMillis();
+        while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
+            rightButton.setPosition(0);}
     }
 
-    public boolean pingRight() {
-        long iTime = System.currentTimeMillis();
-        colorSensorRight.enableLed(true);
-        boolean flag1 = false;
-        boolean flag2 = false;
-        while (System.currentTimeMillis()-iTime < 1000 && opModeIsActive()) {
-            if(colorSensorRight.red() > 4) {
-                flag1 = true;
-            }
-            if(colorSensorRight.blue() > 4) {
-                flag2 = true;
-            }
-            telemetry.addData("pinging", colorSensorRight.red() + " " + colorSensorRight.blue());
-            telemetry.update();
-        }
-        colorSensorRight.enableLed(false);
-        return flag1 && flag2;
-    }
+
     @Override
     public void runOpMode() throws InterruptedException {
-        waitForStart();
         hwMap = hardwareMap;
         leftMotor = hwMap.dcMotor.get("left_drive");
         rightMotor = hwMap.dcMotor.get("right_drive");
@@ -332,8 +367,8 @@ public class FirstAuto extends LinearOpMode {
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         gyroSensor=hardwareMap.gyroSensor.get("gyro");
-        colorSensorRight=hardwareMap.colorSensor.get("color_right");
-        //colorSensorLeft=hardwareMap.colorSensor.get("color_right");
+        colorSensorRight =hardwareMap.colorSensor.get("color_right");
+        colorSensorLeft=hardwareMap.colorSensor.get("color_left");
 
         gyroSensor.calibrate();
         while (gyroSensor.isCalibrating() && opModeIsActive()) {
@@ -345,19 +380,21 @@ public class FirstAuto extends LinearOpMode {
         telemetry.addData("Finished Calibrating", true);
         telemetry.update();
 
+        waitForStart();
 
         //This stuff is decent
-        float turningSpeed=.5f;
+        float turningSpeed=.45f;
         travelMeters(.5f, 1f);
-        turnToAbsDegree(315,turningSpeed,"left");
-        travelMeters(.7f,1);
+        turnToAbsDegree(297,turningSpeed,"left");
+        travelMeters(.96f,1);
         turnToAbsDegree(0,turningSpeed,"right");
         //This stuff is not
         pressButton();
+        travelMeters(.1f,1);
         pressButton();
         //This stuff may or may not be decent
-        turnToAbsDegree(150,turningSpeed,"right");//turn to point at center
-        travelMeters(2,1);//go to the center and park
+        turnToAbsDegree(140,turningSpeed,"right");//turn to point at center
+        travelMeters(.82f,1);//go to the center and park
         //MAYBE INCLUDE SOME FIRING HERE
         while(opModeIsActive()){
             telemetry.update();
