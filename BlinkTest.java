@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 /**
  * Created by Student on 9/13/2016.
  */
-@Autonomous(name="BlinkTest", group="Iterative Opmode")
+//@Autonomous(name="BlinkTest", group="Iterative Opmode")
 public class BlinkTest extends LinearOpMode {
     HardwareMap hw=null;
     //comment

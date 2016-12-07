@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.UltrasonicSensor;
  */
 //THIS IS THE CLASS THAT SHOULD CONTAIN ALL WORK
 //IT IS UNBREAKABLE.  ITS ALL READY PROBABLY BROKEN BEYOND ALL BREAKABLILITY
-    @Autonomous(name="TestBase", group="Iterative Opmode")
+  //  @Autonomous(name="TestBase", group="Iterative Opmode")
 public class baseClass extends LinearOpMode {
     HardwareMap hwMap           =  null;
     public DcMotor leftMotor   = null;

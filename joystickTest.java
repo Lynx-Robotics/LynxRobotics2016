@@ -18,20 +18,24 @@ import com.qualcomm.robotcore.hardware.CRServo;
 @TeleOp(name="Joystick Final")
 public class joystickTest extends LinearOpMode {
     HardwareMap hwMap = null;
-   // HardwareFunctions hf = null;
+
     DcMotor leftMotor;
     DcMotor rightMotor;
     DcMotor forkliftMotor;
     DcMotor sweeperMotor;
     DcMotor shooterMotor;
-    Servo leftButton;
-    Servo rightButton;
-    OpticalDistanceSensor odsSensor;
-    boolean toggleForwardSweeper;
-    boolean shootingInProgress,leftButtonInProgress,rightButtonInProgress;
-    long leftButtonStartTime, rightButtonStartTime;
+    DcMotor spinnerMotor;
+
     DcMotor greenLED;
     DcMotor blueLED;
+
+    Servo leftButton;
+    Servo rightButton;
+
+    OpticalDistanceSensor odsSensor;
+
+    boolean toggleForwardSweeper;
+    boolean shootingInProgress,leftButtonInProgress,rightButtonInProgress;
 
     final long programStartTime = System.currentTimeMillis();
 
@@ -40,22 +44,28 @@ public class joystickTest extends LinearOpMode {
         leftButtonInProgress = false;
         rightButtonInProgress = false;
         toggleForwardSweeper = false;
+
         //Init function
         //ODS name: balldetect
         //Encoders: left_drive, right_drive, shooter
         hwMap = hardwareMap;
+
         leftMotor = hwMap.dcMotor.get("left_drive");
         rightMotor = hwMap.dcMotor.get("right_drive");
         leftMotor.setPower(0);
         rightMotor.setPower(0);
+
         forkliftMotor = hwMap.dcMotor.get("forklift");
         sweeperMotor = hwMap.dcMotor.get("sweeper");
         shooterMotor = hwMap.dcMotor.get("shooter");
+        spinnerMotor = hwMap.dcMotor.get("spinner");
+        blueLED = hwMap.dcMotor.get("blue");
+        greenLED = hwMap.dcMotor.get("green");
         leftButton = hwMap.servo.get("left_button");
         rightButton = hwMap.servo.get("right_button");
+
         odsSensor = hwMap.opticalDistanceSensor.get("balldetect");
-        blueLED=hwMap.dcMotor.get("blue");
-        greenLED=hwMap.dcMotor.get("green");
+
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftMotor.setDirection(DcMotor.Direction.FORWARD);
@@ -63,22 +73,21 @@ public class joystickTest extends LinearOpMode {
         sweeperMotor.setDirection(DcMotor.Direction.FORWARD);
         shooterMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        //NOTHING HAS BEEN TESTED.  NOTHING WORKS.  GOOD LUCK stfu sam
-        //TODO: EVERYTHING
-
         //Looping function
         waitForStart();
         while(opModeIsActive()) {
             //Gamepad 1 is the driver controller and Gamepad 2 is the auxiliary
-            if(odsSensor.getLightDetected()>.1){
-                //ball in shooter
-                //telemetry.addData("(Light) Ball in Shooter:", odsSensor.getLightDetected());
+            if(odsSensor.getLightDetected()>.1){//ball in shooter
                 telemetry.addData("FIRE","YES");
+                greenLED.setPower(1);
             }
-            else{
-                telemetry.addData("FIRE", "NO");}
-                telemetry.update();
+            else{//ball maybe not in shooter
+                telemetry.addData("FIRE", "MAYBE");
+                greenLED.setPower(0);
+            }
+            telemetry.update();
 
+            blueLED.setPower(1);
             leftMotor.setPower(gamepad1.left_stick_y);
             rightMotor.setPower(gamepad1.right_stick_y);
             forkliftMotor.setPower(gamepad2.left_stick_y);
@@ -89,7 +98,6 @@ public class joystickTest extends LinearOpMode {
                 sweeperMotor.setDirection(DcMotor.Direction.REVERSE);
                 sweeperMotor.setPower(1.0f);
             } else if(gamepad1.right_bumper){
-                blueLED.setPower(1);
                 //Right bumper pressed, go forward on sweeper (toggle)
                 //if(toggleForwardSweeper) toggleForwardSweeper = false;
                 //else toggleForwardSweeper = true;
@@ -100,17 +108,9 @@ public class joystickTest extends LinearOpMode {
                 sweeperMotor.setPower(0.0f);
             }
 
+            //For catapult, auxiliary driver can manually control the catapult with the gamepad1 (right)
+            shooterMotor.setPower(gamepad2.right_stick_y);
 
-            if(gamepad1.y){
-                blueLED.setPower(1);
-            }
-            else if(gamepad1.a){
-                greenLED.setPower(0);
-            }
-            else {
-                blueLED.setPower(0);
-                blueLED.setPower(0);
-            }
             //For forward sweeper, set toggle
             /*
             if(toggleForwardSweeper){
@@ -138,9 +138,19 @@ public class joystickTest extends LinearOpMode {
 
             //Left bumper on Gamepad 2 attempts to extend left button pusher, else retracts it
             if(gamepad2.right_bumper) {
-                rightButton.setPosition(0.8);
+                rightButton.setPosition(1);
             } else {
                 rightButton.setPosition(0);
+            }
+
+            if(gamepad2.b){
+                spinnerMotor.setPower(1);
+            }
+            else if(gamepad2.y){
+                spinnerMotor.setPower(-1);
+            }
+            else{
+                spinnerMotor.setPower(0);
             }
         }
     }
@@ -216,11 +226,11 @@ public class joystickTest extends LinearOpMode {
     }
     public void shootWithTime() {
         shooterMotor.setPower(1);
-        sleep(130);
+        sleep(17);
         shooterMotor.setPower(0);
         sleep(500);
-        shooterMotor.setPower(-1);
-        sleep(100);
+        shooterMotor.setPower(-.2);
+        sleep(350);
         shooterMotor.setPower(0);
     }
     //Function that shoots the catapult using the DC Motor encoder

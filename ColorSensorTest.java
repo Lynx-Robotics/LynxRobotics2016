@@ -11,20 +11,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 @Autonomous(name="ColorSensorTest", group="Iterative Opmode")
 public class ColorSensorTest extends LinearOpMode {
     HardwareMap hw=null;
-    public ColorSensor colorSensorLeft=null;
-    public ColorSensor colorSensorRight=null;
-
+    public ColorSensor colorSensor=null;
 
     public void runOpMode() throws InterruptedException{
         waitForStart();
-        colorSensorRight=hardwareMap.colorSensor.get("color_right");
-        colorSensorLeft=hardwareMap.colorSensor.get("color_left");
-
-
+        colorSensor=hardwareMap.colorSensor.get("color");
 
         int i = 0;
-        colorSensorLeft.enableLed(false);
-        colorSensorRight.enableLed(true);
+        colorSensor.enableLed(true);
         while(opModeIsActive()){
             /*
             //telemetry.addData("", hf.getColorSensorBlue() + " " + hf.getColorSensorGreen() + " " + hf.getColorSensorRed());
@@ -44,10 +38,10 @@ public class ColorSensorTest extends LinearOpMode {
     }
 
     public void printColors(){
-        telemetry.addData("blue: ", colorSensorLeft.blue());
-        telemetry.addData("red: ", colorSensorLeft.red());
-        telemetry.addData("green: ", colorSensorLeft.green());
-        telemetry.addData("alpha:", colorSensorLeft.alpha());
+        telemetry.addData("blue: ", colorSensor.blue());
+        telemetry.addData("red: ", colorSensor.red());
+        telemetry.addData("green: ", colorSensor.green());
+        telemetry.addData("alpha:", colorSensor.alpha());
         telemetry.update();
     }
 

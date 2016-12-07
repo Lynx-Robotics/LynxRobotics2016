@@ -10,16 +10,23 @@ import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import android.app.Activity;
+import android.content.Context;
+import android.hardware.SensorEventListener;
+import android.os.Bundle;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 /**
  * Created by Student on 10/18/2016.
  */
-@Autonomous(name="Left Auto--1", group="Iterative Opmode")
-public class FirstAuto extends LinearOpMode {
+@Autonomous(name="Left Auto--2", group="Iterative Opmode")
+public class NewFirstAuto extends LinearOpMode{
 
     //BEFORE YOU CHANGE THIS CODE, TEST IT.  THEN THINK ABOUT WHETHER OR NOT YOUR CHANGE WILL BREAK THE CODE
     //THEN DON'T CHANGE THE CODE
     public GyroSensor gyroSensor=null;
+
     HardwareMap hwMap=null;
     DcMotor leftMotor;
     DcMotor rightMotor;
@@ -95,58 +102,58 @@ public class FirstAuto extends LinearOpMode {
 
     //Used
     public void turnToAbsDegree(double degree,double speed,String direction){
-        double currentHeading=gyroSensor.getHeading();
+        //double currentHeading=gyroSensor.getHeading();
 
         if((direction=="right"||direction=="r")&&degree!=0){
-            while(currentHeading>degree && currentHeading>3 && opModeIsActive()){
+            while(azimut>degree && azimut>3 && opModeIsActive()){
                 //if we start after the degree and we are turning right then do this until we get to degree 0
-                currentHeading=gyroSensor.getHeading();
+               // currentHeading=gyroSensor.getHeading();
                 runDriveTrain((float)speed,(float)-speed);
-                telemetry.addData("heading",currentHeading);
+                telemetry.addData("heading",azimut);
                 telemetry.update();
             }
-            while(currentHeading<degree && opModeIsActive()) {
+            while(azimut<degree && opModeIsActive()) {
                 //turn until we hit the degree
                 //may need a correction factor to avoid over shooting
-                currentHeading = gyroSensor.getHeading();
+                //currentHeading = gyroSensor.getHeading();
                 runDriveTrain((float) speed, (float) -speed);
-                telemetry.addData("heading", currentHeading);
+                telemetry.addData("heading", azimut);
                 telemetry.update();
             }
         }else if(direction=="right"||direction=="r"){
             //degree=0;
-            while(currentHeading<355 && currentHeading>3 && opModeIsActive()) {
-                currentHeading = gyroSensor.getHeading();
+            while(azimut<355 && azimut>3 && opModeIsActive()) {
+              // currentHeading = gyroSensor.getHeading();
                 runDriveTrain((float) speed, (float) -speed);
-                telemetry.addData("heading", currentHeading);
+                telemetry.addData("heading", azimut);
                 telemetry.update();
             }
 
         }else if((direction=="left"||direction=="l")&&degree!=0) {
-            while(currentHeading<degree && opModeIsActive()){
+            while(azimut<degree && opModeIsActive()){
                 //if we start before the degree and we are turning left then do this until we get to degree 360
-                currentHeading=gyroSensor.getHeading();
+               // currentHeading=gyroSensor.getHeading();
                 runDriveTrain((float)-speed,(float)speed);
-                telemetry.addData("heading",currentHeading);
+                telemetry.addData("heading",azimut);
                 telemetry.update();
             }
-            while((currentHeading>degree || currentHeading < 5) && opModeIsActive()) {//+3 avoid
+            while((azimut>degree || azimut < 5) && opModeIsActive()) {//+3 avoid
                 //turn until we hit the degree
                 //may need a correction factor to avoid over shooting
-                currentHeading = gyroSensor.getHeading();
+               // currentHeading = gyroSensor.getHeading();
                 runDriveTrain((float) -speed, (float) speed);
-                telemetry.addData("heading", currentHeading);
+                telemetry.addData("heading", azimut);
                 telemetry.update();
             }
         }
         else if(direction=="left"||direction=="l"){
             double startingHeading=gyroSensor.getHeading();
-            while(currentHeading<startingHeading && opModeIsActive()) {//+3 avoid
+            while(azimut<startingHeading && opModeIsActive()) {//+3 avoid
                 //turn until we hit the degree
                 //may need a correction factor to avoid over shooting
-                currentHeading = gyroSensor.getHeading();
+                azimut = gyroSensor.getHeading();
                 runDriveTrain((float) -speed, (float) speed);
-                telemetry.addData("heading", currentHeading);
+                telemetry.addData("heading", azimut);
                 telemetry.update();
             }
 
@@ -337,12 +344,12 @@ public class FirstAuto extends LinearOpMode {
             if(colorSensorLeft.blue()>=2 && colorSensorLeft.blue()>colorSensorLeft.red()){
                 color="blue";
             }
-           else if(colorSensorLeft.red()>=2 && colorSensorLeft.red()>colorSensorLeft.blue()){
+            else if(colorSensorLeft.red()>=2 && colorSensorLeft.red()>colorSensorLeft.blue()){
                 color="red";
             }}
         runDriveTrain(0,0);
         pressLeftButton();
-        }
+    }
 
     //Use the button pressor to press the beacon (on left side)
     public void pressLeftButton(){
@@ -350,7 +357,7 @@ public class FirstAuto extends LinearOpMode {
         while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
             leftButton.setPosition(0);
         }
-         t=System.currentTimeMillis();
+        t=System.currentTimeMillis();
         while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
             leftButton.setPosition(1);
         }
@@ -360,8 +367,8 @@ public class FirstAuto extends LinearOpMode {
     public void pressRightButton(){
         long t=System.currentTimeMillis();
         while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
-        rightButton.setPosition(1);}
-         t=System.currentTimeMillis();
+            rightButton.setPosition(1);}
+        t=System.currentTimeMillis();
         while(System.currentTimeMillis()<t+2000 && opModeIsActive()) {
             rightButton.setPosition(0);}
     }
@@ -374,6 +381,28 @@ public class FirstAuto extends LinearOpMode {
         sleep(400);
         shooterMotor.setPower(0);
     }
+    double azimut; //is this even close to correct?  It is copied and pasted
+    float[] mGravity;
+    float[] mGeomagnetic;
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            mGravity = event.values;
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            mGeomagnetic = event.values;
+        if (mGravity != null && mGeomagnetic != null) {
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+            if (success) {
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                azimut =  (180+Math.toDegrees(orientation[0]))%360; // orientation contains: azimut, pitch and roll.  We want azimut
+            }
+        }
+    }
+  public double getCurrentDegs(){
+        return azimut; //azimut is a global;
+  }
 
     @Override
     public void runOpMode() throws InterruptedException {

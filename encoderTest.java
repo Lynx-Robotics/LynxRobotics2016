@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 /**
  * Created by Student on 9/15/2016.
  */
-@Autonomous(name="EncoderTest", group="Iterative Opmode")
+//@Autonomous(name="EncoderTest", group="Iterative Opmode")
 public class encoderTest extends LinearOpMode {
 
     HardwareMap hw=null;
