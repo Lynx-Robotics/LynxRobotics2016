@@ -31,6 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.GyroSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import com.qualcomm.hardware.hitechnic.HiTechnicNxtGyroSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -47,7 +58,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to th org.firstinspires.ftc.teamcodee Driver Station OpMode list
 */
-//@Autonomous(name="GyroTest", group="Iterative Opmode")
+@Autonomous(name="GyroTest", group="Iterative Opmode")
 //to clarify, the hardware isn't made to work.  See the function in encoder test for farther reference.
 //hf.getGyroRotation(gyro) gives gyro rotation in z in arbitrary units.
 //numerical integration FTW.
@@ -73,7 +84,7 @@ public class GyroTest extends LinearOpMode {
         boolean curResetState  = false;
 
         // get a reference to a Modern Robotics GyroSensor object.
-        gyro = (HiTechnicNxtGyroSensor)hwMap.gyroSensor.get("gyro");
+        gyro = (HiTechnicNxtGyroSensor)hwMap.get("gyro");
 
         // start calibrating the gyro.
         telemetry.addData(">", "Gyro Calibrating. Do Not move!");
@@ -93,17 +104,16 @@ public class GyroTest extends LinearOpMode {
         waitForStart();
         //gyro.resetZAxisIntegrator();
         while (opModeIsActive())  {
-            leftMotor.setPower(20);
-            rightMotor.setPower(-20);
+
 
             // get the heading info.
             // the Modern Robotics' gyro sensor keeps
             // track of the current heading for the Z axis only.
             //heading = gyro.getHeading();
-            angleZ  = gyro.getRotationFraction();
+            angleZ  = gyro.getHeading();
 
             //telemetry.addData("0", "Heading %03d", heading);
-            telemetry.addData("1", "Rotation Fraction", angleZ);
+            telemetry.addData("1", "Heading", angleZ);
             telemetry.update();
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
